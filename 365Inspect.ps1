@@ -1,9 +1,9 @@
 <#
   .SYNOPSIS
-  Performs Office 365 security assessment.
+  Performs 365 security assessment.
 
   .DESCRIPTION
-  Automate the security assessment of Microsoft Office 365 environments.
+  Automate the security assessment of Microsoft 365 environments.
 
   .PARAMETER UserPrincipalName
   The UPN of the user executing 365Inspect. This value is automatically passed to supported connection strings for PowerShell modules.

@@ -6,27 +6,27 @@ $errorHandling = "$((Get-Item $PSScriptRoot).Parent.FullName)\Write-ErrorLog.ps1
 
 function Inspect-DangerousDefaults {
     Try {
-        $permissions = (Invoke-GraphRequest -method get -uri "https://$(@($global:graphURI))/beta/policies/AuthorizationPolicy").Value.defaultUserRolePermissions
-        $authPolicy = (Invoke-GraphRequest -method get -uri "https://$(@($global:graphURI))/beta/policies/AuthorizationPolicy").Value
-        $caPolicy = (Invoke-GraphRequest -method get -uri "https://$(@($global:graphURI))/v1.0/policies/conditionalAccessPolicies").Value | Where-Object { $_.Conditions.Applications.IncludeApplications -eq '797f4846-ba00-4fd7-ba43-dac1f8f63013' }
+        $permissions = (Invoke-GraphRequest -Method get -Uri "https://$(@($global:graphURI))/beta/policies/AuthorizationPolicy").Value.defaultUserRolePermissions
+        $authPolicy = (Invoke-GraphRequest -Method get -Uri "https://$(@($global:graphURI))/beta/policies/AuthorizationPolicy").Value
+        $caPolicy = (Invoke-GraphRequest -Method get -Uri "https://$(@($global:graphURI))/v1.0/policies/conditionalAccessPolicies").Value | Where-Object { $_.Conditions.Applications.IncludeApplications -eq '797f4846-ba00-4fd7-ba43-dac1f8f63013' }
         $tenantCreation = $permissions.allowedToCreateTenants
 
         $dangerousDefaults = @()
 
 
         If (! $caPolicy) {
-            $dangerousDefaults += "No Conditional Access Policy exists to restrict non-administrator access to Azure Active Directory or Entra."
+            $dangerousDefaults += "No Conditional Access Policy exists to restrict non-administrator access to Entra ID or Entra."
         }
         foreach ($policy in $caPolicy) {
             If ($policy.State -eq 'disabled') {
-                $dangerousDefaults += "Conditional Access Policy ($($policy.displayName)) to restrict non-administrator access to Azure Active Directory or Entra exists in a disabled state."
+                $dangerousDefaults += "Conditional Access Policy ($($policy.displayName)) to restrict non-administrator access to Entra ID or Entra exists in a disabled state."
             }
             ElseIf ($policy.State -eq 'enabledForReportingButNotEnforced') {
-                $dangerousDefaults += "Conditional Access Policy ($($policy.displayName)) to restrict non-administrator access to Azure Active Directory or Entra exists in a report-only state."
+                $dangerousDefaults += "Conditional Access Policy ($($policy.displayName)) to restrict non-administrator access to Entra ID or Entra exists in a report-only state."
             }
         }
         If ($permissions.AllowedToReadOtherUsers -eq $true) {
-            $dangerousDefaults += "Users can read all attributes in Azure AD"
+            $dangerousDefaults += "Users can read all attributes in Entra ID"
         }
         if ($permissions.AllowedToCreateSecurityGroups -eq $true) {
             $dangerousDefaults += "Users can create security groups"
@@ -41,7 +41,7 @@ function Inspect-DangerousDefaults {
             $dangerousDefaults += "Guests can invite other guests into the tenant"
         }
         if ($tenantCreation -eq $true) {
-            $dangerousDefaults += "Users are allowed to create new Azure Active Directory Tenants."
+            $dangerousDefaults += "Users are allowed to create new Entra ID Tenants."
         }
         If ($dangerousDefaults.count -ne 0) {
             Return $dangerousDefaults

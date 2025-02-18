@@ -6,7 +6,7 @@ $errorHandling = "$((Get-Item $PSScriptRoot).Parent.FullName)\Write-ErrorLog.ps1
 
 Function Inspect-AZPSAssignment {
     Try {
-        $applications = @("Microsoft Graph Command Line Tools", "Microsoft Graph PowerShell", "Azure Active Directory PowerShell")
+        $applications = @("Microsoft Graph Command Line Tools", "Microsoft Graph PowerShell", "Entra ID PowerShell")
 
         $aad = $false
 
@@ -15,14 +15,14 @@ Function Inspect-AZPSAssignment {
         #Check for Service Prinicpals
         Foreach ($application in $applications) {
             Try {
-                $app = (Invoke-GraphRequest -method get -uri "https://$(@($global:graphURI))/beta/servicePrincipals?filter=displayName eq '$application'").Value
+                $app = (Invoke-GraphRequest -Method get -Uri "https://$(@($global:graphURI))/beta/servicePrincipals?filter=displayName eq '$application'").Value
             }
             Catch {
-                
+
             }
-        
+
             If ($null -ne $app) {
-                if ($app.DisplayName -eq 'Azure Active Directory PowerShell' -and $app.AppRoleAssignmentRequired -eq $true) {
+                if ($app.DisplayName -eq 'Entra ID PowerShell' -and $app.AppRoleAssignmentRequired -eq $true) {
                     $aad = $true
                 }
                 elseif ((($app.DisplayName -eq 'Microsoft Graph Command Line Tools') -or ($app.DisplayName -eq 'Microsoft Graph PowerShell')) -and $app.AppRoleAssignmentRequired -eq $true) {
@@ -31,11 +31,11 @@ Function Inspect-AZPSAssignment {
             }
         }
 
-        $appAAD = "Azure Active Directory PowerShell assignment is not required"
+        $appAAD = "Entra ID PowerShell assignment is not required"
 
         $appGraph = "Microsoft Graph Command Line Tools (Formerly Microsoft Graph PowerShell) assignment is not required"
 
-        $both = "Neither Azure Active Directory PowerShell nor Microsoft Graph Command Line Tools (Formerly Microsoft Graph PowerShell) assignment is required"
+        $both = "Neither Entra ID PowerShell nor Microsoft Graph Command Line Tools (Formerly Microsoft Graph PowerShell) assignment is required"
 
         If ($aad -eq $false -and $graph -eq $false) {
             Return $both

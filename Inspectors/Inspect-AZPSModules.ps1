@@ -6,7 +6,7 @@ $errorHandling = "$((Get-Item $PSScriptRoot).Parent.FullName)\Write-ErrorLog.ps1
 
 Function Inspect-AZPSModules {
     Try {
-        $applications = @("Microsoft Graph Command Line Tools", "Microsoft Graph PowerShell", "Azure Active Directory PowerShell")
+        $applications = @("Microsoft Graph Command Line Tools", "Microsoft Graph PowerShell", "Entra ID PowerShell")
 
         $void = "No Service Principals Found"
 
@@ -17,14 +17,14 @@ Function Inspect-AZPSModules {
         #Check for Service Prinicpals
         Foreach ($application in $applications) {
             Try {
-                $app = (Invoke-GraphRequest -method get -uri "https://$(@($global:graphURI))/beta/servicePrincipals?filter=displayName eq '$application'").Value
+                $app = (Invoke-GraphRequest -Method get -Uri "https://$(@($global:graphURI))/beta/servicePrincipals?filter=displayName eq '$application'").Value
             }
             Catch {
                 return $void
             }
-            
+
             If ($null -ne $app) {
-                if ($app.AppDisplayName -eq "Azure Active Directory PowerShell") {
+                if ($app.AppDisplayName -eq "Entra ID PowerShell") {
                     $aad = $true
                 }
                 elseif ($app.AppDisplayName -eq "Microsoft Graph Command Line Tools") {
@@ -33,11 +33,11 @@ Function Inspect-AZPSModules {
             }
         }
 
-        $appAAD = "Azure Active Directory PowerShell is not configured"
+        $appAAD = "Entra ID PowerShell is not configured"
 
         $appGraph = "Microsoft Graph Command Line Tools is not configured"
 
-        $both = "Neither Azure Active Directory PowerShell nor Microsoft Graph Command Line Tools is configured"
+        $both = "Neither Entra ID PowerShell nor Microsoft Graph Command Line Tools is configured"
 
         If ($aad -eq $false -and $graph -eq $false) {
             Return $both
@@ -49,7 +49,7 @@ Function Inspect-AZPSModules {
             Return $appGraph
         }
         else {
-                
+
         }
     }
     Catch {
