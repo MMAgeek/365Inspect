@@ -17,9 +17,6 @@
   .PARAMETER reportType
   Optional parameter allowing a specific report output format. Currently supported formats are HTML, JSON, CSV, and XML. Default value is 'All' and generates all formats.
 
-  .PARAMETER pnpPowerShellClientId
-  Optional parameter allowing a specific Application/Client ID for PnP.Powershell. You must create the Entra ID application to use PnP PowerShell. https://pnp.github.io/powershell/articles/registerapplication.html
-
   .INPUTS
   None. You cannot pipe objects to 365Inspect.ps1.
 
@@ -43,9 +40,6 @@ param (
     [ValidateSet("All", "HTML", "CSV", "XML", "JSON",
         IgnoreCase = $true)]
     [string] $reportType = "All",
-    [Parameter(Mandatory = $false,
-        HelpMessage = 'PnP PowerShell Client ID')]
-    [string] $pnpPowerShellClientId,
     [Parameter(Mandatory = $false,
         HelpMessage = 'Skip Module Check')]
     [switch]$SkipModuleCheck,
@@ -179,12 +173,7 @@ Function Connect-Services {
             Write-Output "Connecting to SharePoint Service"
             $org_name = ($global:tenantDomain -split '.onmicrosoft.com')[0]
 
-            if ($pnpPowerShellClientId) {
-                $pnpApp = $pnpPowerShellClientId
-            }
-            else {
-                $pnpApp = Read-Host -Prompt "Please enter the Application/Client ID of the application created to replace PnP.Powershell"
-            }
+            $pnpApp = Read-Host -Prompt "Please enter the Application/Client ID of the application created to replace PnP.Powershell"
 
             # National Cloud deployment - Valid environments are: 'USGovernment', 'USGovernmentHigh', 'USGovernmentDoD', 'Germany', 'China'
             Connect-PnPOnline -AzureEnvironment $Environment -Url "https://$org_name-admin.sharepoint.com" -ClientId $pnpApp -Interactive
@@ -289,12 +278,7 @@ Function Connect-Services {
             Write-Output "Connecting to SharePoint Service"
             $org_name = ($global:tenantDomain -split '.onmicrosoft.com')[0]
 
-            if ($pnpPowerShellClientId) {
-                $pnpApp = $pnpPowerShellClientId
-            }
-            else {
-                $pnpApp = Read-Host -Prompt "Please enter the Application/Client ID of the application created to replace PnP.Powershell"
-            }
+            $pnpApp = Read-Host -Prompt "Please enter the Application/Client ID of the application created to replace PnP.Powershell"
 
             # National Cloud deployment - Valid environments are: 'USGovernment', 'USGovernmentHigh', 'USGovernmentDoD', 'Germany', 'China'
             Connect-PnPOnline -AzureEnvironment $Environment -DeviceLogin -Url "https://$org_name-admin.sharepoint.com" -ClientId $pnpApp
